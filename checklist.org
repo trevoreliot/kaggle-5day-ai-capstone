@@ -1,0 +1,46 @@
+#+title: Kaggle 5-Day AI Agents Comp
+* Deliverables
+** - [ ] Writeup
+** - [ ] Codebase (Kaggle Notebook)
+** - [ ] Video Demo
+** - [ ] Project/Repo Link
+
+* Evaluation (3 of 5 features must be demonstrated)
+
+| Key Concept                      | Where to Demonstrate |
+|----------------------------------+----------------------|
+| Agent / Multi-agent system (ADK) | Code                 |
+| MCP Server                       | Code                 |
+| Antigravity                      | Video                |
+| Security features                | Code or Video        |
+| Deployability                    | Video                |
+| Agent skills (e.g., Agents CLI)  | Code or Video        |
+
+* Category 1: The Pitch - Problem, Solution, Value (30 points total)
+** - [ ] Problem Statement (10 pts)
+   - [ ] Clear description of the specific challenge, pain point, or bottleneck.
+   - [ ] Explanation of why this problem is important and worth solving.
+** - [ ] Proposed Solution & Agent Utility (10 pts)
+   - [ ] Clear explanation of the agent or multi-agent system structure.
+   - [ ] Rationale for why an agentic workflow is the right fit to solve the problem.
+** - [ ] Value Proposition & Innovation (10 pts)
+   - [ ] Description of the expected business impact, productivity gains, or efficiency.
+   - [ ] Highlight of any innovative features or novel application of agent technology.
+
+* Category 2: The Implementation - Architecture, Code (70 points total)
+** - [ ] Technical Design & Architecture (25 pts)
+   - [ ] Detailed description of the agent system architecture and component interactions.
+   - [ ] Inclusion of system diagrams or visual workflow representations.
+** - [ ] Code Quality & Readability (25 pts)
+   - [ ] Code is well-organized, modular, and easy to follow.
+   - [ ] Relevant comments explaining code implementation and agent behaviors.
+** - [ ] Key Concept Integrations (20 pts)
+   - [ ] Integration of at least 3 of the 5 core concepts (MCP, Antigravity, Security, Deployability, Agent skills).
+   - [ ] Meaningful tool, memory, or model routing implementation.
+
+* Bonus (Up to 20 points)
+** - [ ] Video Walkthrough & Demo (10 pts)
+   - [ ] Under 5 minutes, demonstrating the agent executing commands and solving the target problem.
+** - [ ] Detailed Writeup (10 pts)
+   - [ ] High-quality writeup submitted by the deadline, explaining the setup and implementation details.
+
