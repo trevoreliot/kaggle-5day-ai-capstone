@@ -18,7 +18,7 @@ def test_umls_placeholder():
 
 def test_rules_excludes1():
     """Test the Excludes1 rule checking logic."""
-    res = check_coding_rules(["J00", "J01.90"])
+    res = check_coding_rules(["E10.9", "E11.9"])
     assert not res[0]["valid"]
     assert res[0]["rule_type"] == "Excludes1"
     
