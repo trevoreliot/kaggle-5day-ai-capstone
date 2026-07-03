@@ -8,12 +8,12 @@
    - [X] Set up an MCP server to handle secure local file reads (for clinical notes).
    - [X] **Develop a Vector Database/RAG MCP Tool using ChromaDB:** Enable the agent to semantically search your uploaded ICD-10-CM Alphabetic Index and Tabular List. This is critical because the agent must locate codes based on clinical diagnostic statements, mapping them first through the Alphabetic Index and verifying in the Tabular List [1].
    - [X] **Develop a UMLS / SNOMED CT API MCP Tool:** Allow the agent to query the Unified Medical Language System to normalize medical jargon and abbreviations. This ensures the agent can accurately distinguish between definitive diagnoses and mere symptoms, as **codes that describe symptoms and signs are only acceptable for reporting when a related definitive diagnosis has not been established** [2].
-      -- FIXME: update with UMLS api key once acquired
+      - [ ] FIXME: update with UMLS api key once acquired
    - [X] **Develop a Rule-Checker MCP Tool:** Create a programmatic tool to validate complex coding conventions, such as flagging when proposed codes violate an **Excludes1 ("NOT CODED HERE!")** or **Excludes2 ("Not included here")** instruction [3, 4].
 ** Day 3: Agent Architecture & Prompt Engineering
-   - [ ] Design the agent's system prompt to act as an expert Medical Coder and Auditor.
-   - [ ] Implement the "Entity Extraction" step: Instruct the agent to read the clinical note and extract all diagnoses, symptoms, and pathogens.
-   - [ ] Implement the "Reconciliation" step: Instruct the agent to compare extracted entities against the *already coded* list to find missing codes.
+   - [X] Design the agent's system prompt to act as an expert Medical Coder and Auditor.
+   - [X] Implement the "Entity Extraction" step: Instruct the agent to read the clinical note and extract all diagnoses, symptoms, and pathogens.
+   - [X] Implement the "Reconciliation" step: Instruct the agent to compare extracted entities against the *already coded* list to find missing codes.
 ** Day 4: Implementing ICD-10-CM Business Logic
    - [ ] Program the agent to check for "Code First" / "Use Additional Code" violations, ensuring the underlying etiology is sequenced before the manifestation [4].
    - [ ] Ensure the agent enforces the rule that **a code with an applicable 7th character is invalid without that 7th character**, and handles placeholder 'X' requirements correctly [5, 6].
