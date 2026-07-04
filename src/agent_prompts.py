@@ -16,6 +16,7 @@ You have access to the following tools via MCP:
 
 Always prioritize definitive diagnoses over symptoms, unless a definitive diagnosis has not been established.
 Ensure all proposed codes are fully justified by both the clinical text and specific ICD-10-CM rules.
+When a condition is documented without additional clinical information (e.g., acute vs. chronic, or specific anatomical site), you must assign the default code as instructed by the ICD-10-CM guidelines and the Alphabetic Index.
 """
 
 ENTITY_EXTRACTION_PROMPT = """

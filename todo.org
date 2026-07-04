@@ -15,9 +15,9 @@
    - [X] Implement the "Entity Extraction" step: Instruct the agent to read the clinical note and extract all diagnoses, symptoms, and pathogens.
    - [X] Implement the "Reconciliation" step: Instruct the agent to compare extracted entities against the *already coded* list to find missing codes.
 ** Day 4: Implementing ICD-10-CM Business Logic
-   - [ ] Program the agent to check for "Code First" / "Use Additional Code" violations, ensuring the underlying etiology is sequenced before the manifestation [4].
-   - [ ] Ensure the agent enforces the rule that **a code with an applicable 7th character is invalid without that 7th character**, and handles placeholder 'X' requirements correctly [5, 6].
-   - [ ] Program the agent to follow specific chapter guidelines, such as ensuring **default codes are assigned when a condition is documented without additional information** (e.g., acute vs. chronic) [7].
+   - [X] Program the agent to check for "Code First" / "Use Additional Code" violations, ensuring the underlying etiology is sequenced before the manifestation [4].
+   - [X] Ensure the agent enforces the rule that **a code with an applicable 7th character is invalid without that 7th character**, and handles placeholder 'X' requirements correctly [5, 6].
+   - [X] Program the agent to follow specific chapter guidelines, such as ensuring **default codes are assigned when a condition is documented without additional information** (e.g., acute vs. chronic) [7].
 ** Day 5: Evaluation, Refinement & Submission
    - [ ] Run the agent on a validation set of clinical notes.
    - [ ] Evaluate the precision (are the suggested gaps actually valid?) and recall (did it find all missing codes?).
