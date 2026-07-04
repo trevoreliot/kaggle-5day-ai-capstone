@@ -9,6 +9,8 @@ from src.agent_prompts import SYSTEM_PROMPT, ENTITY_EXTRACTION_PROMPT, RECONCILI
 from src.data_processing import load_patient_diagnoses
 from src.pipeline import check_needs_reconciliation
 from src.rules import check_coding_rules
+from src.rag import search_icd10_rag
+from src.umls import query_umls
 
 # Data models for structured output
 class Entity(BaseModel):
@@ -26,6 +28,95 @@ class MissingCode(BaseModel):
 
 class ReconciliationResponse(BaseModel):
     missing_codes: list[MissingCode]
+
+# Native Tools for Gemini
+def search_icd10_tool(query: str, top_k: int = 5) -> str:
+    """Search the ICD-10-CM guidelines and tabular list for a given query."""
+    return json.dumps(search_icd10_rag(query, n_results=top_k), indent=2)
+
+def normalize_medical_term_tool(term: str) -> str:
+    """Query the UMLS API to normalize medical jargon or symptoms."""
+    return json.dumps(query_umls(term), indent=2)
+
+def validate_icd10_codes_tool(codes: list[str]) -> str:
+    """Validates a list of ICD-10-CM codes against Excludes1, Excludes2, and 7th character rules."""
+    return json.dumps(check_coding_rules(codes), indent=2)
+
+GEMINI_TOOLS = [search_icd10_tool, normalize_medical_term_tool, validate_icd10_codes_tool]
+
+class MedicalCodingAgent:
+    def __init__(self, client):
+        self.client = client
+        
+    def analyze_note(self, note: str, assigned_codes: list[str]) -> list[dict]:
+        # 1. Entity Extraction
+        prompt = ENTITY_EXTRACTION_PROMPT.format(clinical_note=note)
+        
+        config = genai.types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            response_mime_type="application/json",
+            response_schema=ExtractionResponse,
+            temperature=0.0
+        )
+        
+        try:
+            extraction_response = self.client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=config
+            )
+        except Exception as e:
+            if '429' in str(e) or 'quota' in str(e).lower():
+                print("gemini-2.5-flash limit reached for extraction. Falling back to gemini-1.5-flash...")
+                extraction_response = self.client.models.generate_content(
+                    model='gemini-1.5-flash',
+                    contents=prompt,
+                    config=config
+                )
+            else:
+                raise e
+                
+        extracted_entities = extraction_response.text
+        
+        # 2. Reconciliation with Tools
+        recon_prompt = RECONCILIATION_PROMPT.format(
+            extracted_entities=extracted_entities,
+            assigned_codes=assigned_codes
+        )
+        
+        chat_config = genai.types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            tools=GEMINI_TOOLS,
+            response_mime_type="application/json",
+            response_schema=ReconciliationResponse,
+            temperature=0.0
+        )
+        
+        # Use Chats API with Tools to enable the Agent Skill
+        chat = self.client.chats.create(
+            model='gemini-2.5-flash',
+            config=chat_config
+        )
+        
+        try:
+            recon_response = chat.send_message(recon_prompt)
+        except Exception as e:
+            if '429' in str(e) or 'quota' in str(e).lower():
+                print("gemini-2.5-flash limit reached for reconciliation. Falling back to gemini-1.5-flash...")
+                chat = self.client.chats.create(
+                    model='gemini-1.5-flash',
+                    config=chat_config
+                )
+                recon_response = chat.send_message(recon_prompt)
+            else:
+                raise e
+        
+        try:
+            missing = json.loads(recon_response.text).get("missing_codes", [])
+        except Exception:
+            missing = []
+            
+        return missing
 
 def load_data():
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -85,6 +176,9 @@ def evaluate_pipeline(n_samples=5):
 
     results = []
     
+    # Initialize the Agent
+    agent = MedicalCodingAgent(client)
+    
     for idx, diag_row in sampled.iterrows():
         pid = diag_row['patient_id']
         patient = patients_df[patients_df['patient_id'] == pid].iloc[0]
@@ -103,43 +197,9 @@ def evaluate_pipeline(n_samples=5):
         print(f"Assigned (Provided to Agent): {assigned_codes}")
         print(f"Dropped (Target for Agent): {dropped_code}")
         
-        # 1. Entity Extraction
-        prompt = ENTITY_EXTRACTION_PROMPT.format(clinical_note=note)
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt,
-            config=genai.types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                response_mime_type="application/json",
-                response_schema=ExtractionResponse,
-                temperature=0.0
-            )
-        )
+        missing_codes = agent.analyze_note(note, assigned_codes)
         
-        extracted_entities = response.text
-        
-        # 2. Reconciliation
-        recon_prompt = RECONCILIATION_PROMPT.format(
-            extracted_entities=extracted_entities,
-            assigned_codes=assigned_codes
-        )
-        recon_response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=recon_prompt,
-            config=genai.types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                response_mime_type="application/json",
-                response_schema=ReconciliationResponse,
-                temperature=0.0
-            )
-        )
-        
-        try:
-            missing = json.loads(recon_response.text).get("missing_codes", [])
-        except Exception:
-            missing = []
-            
-        suggested_codes = [m["suggested_code"] for m in missing]
+        suggested_codes = [m.get("suggested_code", "") if isinstance(m, dict) else m.suggested_code for m in missing_codes]
         
         print(f"Agent Suggested Missing Codes: {suggested_codes}")
         
@@ -155,7 +215,7 @@ def evaluate_pipeline(n_samples=5):
             "dropped_code": dropped_code,
             "suggested_codes": suggested_codes,
             "found": found,
-            "raw_missing": missing
+            "raw_missing": missing_codes
         })
         time.sleep(4)
         
@@ -166,7 +226,6 @@ def evaluate_pipeline(n_samples=5):
     print(f"Evaluation Complete!")
     print(f"Recall (Found dropped code): {successes}/{total} ({(successes/total)*100:.1f}%)")
     
-    # Precision is a bit trickier, but roughly: out of all suggested codes, how many were the dropped code?
     total_suggested = sum([len(r["suggested_codes"]) for r in results])
     if total_suggested > 0:
         precision = successes / total_suggested

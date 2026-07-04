@@ -36,11 +36,9 @@ def main():
         print(f"Skipping Gemini Client initialization (API key might be missing): {e}")
 
     # 4. Pipeline Execution Check
-    print("\n[4] Pipeline Execution Check Example:")
-    patient_data_codes = ["E11.9", "I10"]
-    agent_codes = ["E11.9", "I10", "E11.29"]
-    if check_needs_reconciliation(agent_codes, patient_data_codes):
-        print("-> Ready to run RECONCILIATION_PROMPT")
+    print("\n[4] Running Pipeline Evaluation:")
+    from src.evaluation import evaluate_pipeline
+    evaluate_pipeline(2)
 
 if __name__ == "__main__":
     main()
