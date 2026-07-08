@@ -8,7 +8,7 @@ Given this landscape, there is a clear opportunity for an intelligent coding ass
 ## The Impact of Coding Gaps
 The necessity of complete and accurate coding varies significantly depending on an institution's role within the healthcare ecosystem:
 - **Large Institutions:** For organizations that carry financial risk based on the clinical complexity of their patient population, comprehensive coding is vital. It directly impacts their financial health, externally visible quality scores, and public standing.
-- **Specialized Providers:** Conversely, smaller or specialized practices (such as an orthopedic surgery clinic) may treat coding more as a formality to qualify patients for specific procedures. In these settings, codes that capture the overall medical complexity of a patient (important comorbidities) are frequently missed.
+- **Specialized Providers:** Conversely, smaller or specialized practices (such as an orthopedic surgery clinic) may treat coding more as a formality to qualify patients for specific procedures. In these settings, codes that capture the overall medical complexity of a patient (important comorbidities) can be missed.
 
 When patients primarily see specialists, this missing data obscures the larger clinical picture. As "total cost of care" and value-based care programs become the standard for both CMS and commercial insurance providers, these coding gaps can be detrimental. It leaves a broad cross-section of the population under-assessed for critical comorbidities, leading to inaccurate risk adjustment and potentially compromised patient care.
 
